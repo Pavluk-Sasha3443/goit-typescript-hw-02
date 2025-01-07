@@ -5,7 +5,7 @@ function Loader({ visible }) {
   return (
     <div className={css.loader}>
       <Watch
-        visible={true}
+        visible={visible}
         height="80"
         width="80"
         radius="48"
