@@ -1,14 +1,20 @@
 import css from "./ImageGallery.module.css";
-import ImageCard from "../ImageCard/ImageCard.jsx";
+import ImageCard from "../ImageCard/ImageCard";
+import { Gallery, ModalInfo } from "../../components/App.types";
 
-const ImageGallery = ({ gallery, onClick }) => {
+interface ImageGalleryProps {
+  gallery: Gallery;
+  onClick: (params: ModalInfo) => void;
+}
+
+const ImageGallery = ({ gallery, onClick }: ImageGalleryProps) => {
   if (!gallery) {
     return;
   }
 
   return (
     <>
-      <div className={css.gallery}>
+      <div>
         <ul className={css.list}>
           {gallery.map((item) => {
             return (

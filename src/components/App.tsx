@@ -1,25 +1,25 @@
-import SearchBar from "./SearchBar/SearchBar";
+import "./App.css";
+import SearchBar from "../components/SearchBar/SearchBar";
 import fetchSearch from "../backEnd/api";
 import { useEffect, useState } from "react";
-import ImageGallery from "./ImageGallery/ImageGallery";
-import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
-import ErrorMessage from "./ErrorMessage/ErrorMessage";
-import ImageModal from "./ImageModal/ImageModal";
+import ImageGallery from "../components/ImageGallery/ImageGallery";
+import LoadMoreBtn from "../components/LoadMoreBtn/LoadMoreBtn";
+import ErrorMessage from "../components/ErrorMessage/ErrorMessage";
+import ImageModal from "../components/ImageModal/ImageModal";
 import toast, { Toaster } from "react-hot-toast";
-import Loader from "./Loader/Loader";
-import "../components/App.css";
+import Loader from "../components/Loader/Loader";
+import { Gallery, ModalInfo } from "./App.types";
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loader, setLoader] = useState(false);
-  const [error, setError] = useState(false);
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [modalImg, setModalImg] = useState();
-  const [scroll, setScroll] = useState(false);
-  const [loadMore, setLoadMore] = useState(false);
-  const [first, setFirst] = useState(false);
+  const [query, setQuery] = useState<string>("");
+  const [images, setImages] = useState<Gallery>([]);
+  const [page, setPage] = useState<number>(1);
+  const [loader, setLoader] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [modalIsOpen, setIsOpen] = useState<boolean>(false);
+  const [modalImg, setModalImg] = useState<ModalInfo>();
+  const [scroll, setScroll] = useState<boolean>(false);
+  const [loadMore, setLoadMore] = useState<boolean>(false);
 
   useEffect(() => {
     let totalPages = 0;
@@ -28,10 +28,9 @@ function App() {
         setLoadMore(false);
         setLoader(true);
         setError(false);
-        const data = await fetchSearch(query, page);
-        if (!first) {
+        const data: any = await fetchSearch(query, page);
+        if (!data) {
           setImages(data);
-          setFirst(true);
         } else {
           if (data === undefined) {
             return;
@@ -62,7 +61,7 @@ function App() {
       }
     }
     fethGellery();
-  }, [query, page, first]);
+  }, [query, page]);
 
   useEffect(() => {
     if (scroll) {
@@ -75,29 +74,33 @@ function App() {
     };
   }, [scroll]);
 
-  const openModal = () => {
+  const openModal = (): void => {
     setIsOpen(true);
     setScroll(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setIsOpen(false);
     setScroll(false);
   };
 
-  const handleClick = (item) => {
-    openModal();
-    setModalImg(item);
-  };
-
-  const clearImages = () => {
+  const clearImages = (): void => {
     setImages([]);
     setPage(1);
   };
 
+  const handleLoadMore = () => {
+    setPage(page + 1);
+  };
+
+  const handleClick = (item: ModalInfo): void => {
+    openModal();
+    setModalImg(item);
+  };
+
   return (
     <>
-      <Toaster position="bottom-right" duration="2000" />
+      <Toaster position="bottom-right" />
       <SearchBar
         setQuery={setQuery}
         clearImages={clearImages}
@@ -105,12 +108,12 @@ function App() {
       />
       {error && <ErrorMessage />}
       <ImageGallery gallery={images} onClick={handleClick} />
+
       <>{loader && <Loader />}</>
-      <>{loadMore && <LoadMoreBtn setPage={setPage} />}</>
+      <>{loadMore && <LoadMoreBtn handleLoadMore={handleLoadMore} />}</>
       <ImageModal
         closeModal={closeModal}
         modalIsOpen={modalIsOpen}
-        openModal={openModal}
         alt={modalImg?.alt_description}
         image={modalImg?.modalSrc}
       />
